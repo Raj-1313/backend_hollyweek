@@ -3,20 +3,27 @@ const app = express.Router();
 const productModel = require("../model/ProductsModel");
 const VisitingMiddleware = require("../middleware/RouteChack_Middleware");
 
+
+
 app.get("/", async (req, res) => {
   const find = req.query.find;
-  const { limit=10 , page=1 } = req.query;
+  const {limit=10,page=1} = req.query;
   try {
     if (find) {
       let products = await productModel.find({
         model: { $regex: find, $options: "i" },
-      }).limit(limit).skip((page-1)*limit);;
+      }).limit(limit).skip(limit*(page-1));
       res.send(products);
+
     } else {
-      let products = await productModel.find().limit(limit).skip((page-1)*limit);;
-      res.send(products);
+
+      let products = await productModel.find().limit(limit).skip((page-1)*limit);
+console.log(products.length)
+      res.send(products)
+
     }
-  } catch (e) {
+  } 
+  catch (e) {
     res.send(e.message);
   }
 });

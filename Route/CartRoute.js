@@ -46,11 +46,16 @@ app.post('/dec',async (req,res) => {
         const prod= await CartModel.find({userID,productID})
       
         if(prod.length>0){
-            const updatedProd= await CartModel.updateOne({userID,productID},{$inc:{"count":-1}},{new:true})
-            return res.send(updatedProd)
-           }else{
-               
-               return res.send(prod)
+            if(prod[0]?.count==1){
+                const rest= await  CartModel.findByIdAndDelete({_id:prod[0]._id})
+                return res.send("Product removed from cart")
+            }else{
+
+                const updatedProd= await CartModel.updateOne({userID,productID},{$inc:{"count":-1}},{new:true})
+                return res.send(updatedProd)
+            }
+           }else{               
+               return res.send({message:"No product found"})
            }
        }catch(err){
            res.send(err.message)

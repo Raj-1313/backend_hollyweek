@@ -18,9 +18,9 @@ app.use(express.json());
 app.use(cors());
 app.use("/auth",AuthRoute)
 
+app.use("/product",productRoute)
 app.use(AuthMiddleware)
 
-app.use("/product",productRoute)
 app.use("/cart",CartRoute)
 
 

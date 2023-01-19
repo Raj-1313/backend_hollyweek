@@ -1,5 +1,4 @@
 const express = require('express')
-const  productModel= require('../model/ProductsModel')
 const app = express.Router()
 const CartModel= require('../model/CartModel')
 
@@ -26,13 +25,13 @@ app.get("/" ,async(req,res)=>{
 app.post('/',async (req,res) => {
      const {userID,productID}= req.body    
      try{
-         const prod= await CartModel.find({userID,productID})
-       
+         const prod= await CartModel.find({userID,productID})       
          if(prod.length>0){
              const updatedProd= await CartModel.updateOne({userID,productID},{$inc:{"count":1}},{new:true})
              return res.send(updatedProd)
             }else{
                 const newProd= await CartModel.create({userID,productID})
+                console.log(newProd)
                 return res.send(newProd)
             }
         }catch(err){

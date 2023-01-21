@@ -3,6 +3,8 @@ const app = express.Router();
 const productModel = require("../model/ProductsModel");
 const userModel = require("../model/Authantication_Model");
 const Admin_check_MiddleWare =require("../middleware/Admin_CheckMiddleware");
+const CartModel= require('../model/CartModel');
+const OrderModel = require("../model/Orders_Model");
 
 app.use(Admin_check_MiddleWare);
 
@@ -129,11 +131,39 @@ app.delete("/user/:id", async (req, res) => {
   }
 });
 
+
+
 // afterpayment
-app.post("/payment",async(req,res)=>{
-  const { userID, } = req.body;
 
 
+app.get("/orders",async(req,res)=>{ 
+try{
+     const finduserInOrders= await OrderModel.find().populate("userID").populate({path:"productDetails.productID",model: 'product' }).exec()
+     res.send(finduserInOrders)   
+}catch(e){
+  res.send({message:e.message})
+}
+})
+
+app.patch("/orders/:id",async(req,res)=>{ 
+  const _id=req.params.id
+  const orderStatus=req.body.orderStatus
+try{
+     const OrdersStatusUpdate= await OrderModel.findByIdAndUpdate({_id},{orderStatus})
+     res.send({message:"status updated successfully"})   
+}catch(e){
+  res.send({message:e.message})
+}
+})
+
+app.delete("/orders/:id",async(req,res)=>{ 
+  const _id=req.params.id
+try{
+     const OrdersStatusUpdate= await OrderModel.findByIdAndDelete({_id})
+     res.send({message:"status deleted successfully"})   
+}catch(e){
+  res.send({message:e.message})
+}
 })
 
 

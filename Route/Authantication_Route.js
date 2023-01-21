@@ -58,7 +58,7 @@ App.post("/login", async (req, res) => {
 
       
     } else {
-      return res.send("Invalid credentials");
+      return res.send("Signup Please");
     }
   } catch (e) {
     return res.status(401).send({message:e.message});

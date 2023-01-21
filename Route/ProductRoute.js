@@ -20,7 +20,6 @@ app.get("/", async (req, res) => {
       let products = await productModel.find().limit(limit).skip((page-1)*limit);
 console.log(products.length)
       res.send(products)
-
     }
   } 
   catch (e) {
@@ -365,7 +364,7 @@ app.get("/filter", async (req, res) => {
 
 
 // app.use(VisitingMiddleware)
-app.get("/:id", VisitingMiddleware, async (req, res) => {
+app.get("/:id",VisitingMiddleware, async (req, res) => {
   const _id = req.params.id;
   try {
     let products = await productModel.find({ _id });

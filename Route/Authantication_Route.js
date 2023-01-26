@@ -2,7 +2,6 @@ const Auth_Sign = require("../model/Authantication_Model");
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const App = express.Router();
-const argon2 = require("argon2");
 const bcrypt = require('bcrypt');
 
 App.post("/signup", async (req, res) => {
@@ -34,33 +33,7 @@ App.post("/signup", async (req, res) => {
   }
 });
 
-// App.post("/login", async (req, res) => {
-//   const { email, password } = req.body;
-//   const User = await Auth_Sign.findOne({ email });
-//   try {
-//     console.log(User)
 
-//     if (await argon2.verify(User.password,password)){
-//           let token = jwt.sign(
-//             {
-//               email,
-//               userID: User._id,
-//             },
-//             process.env.key,
-//             {
-//               expiresIn: "10 day",
-//             }
-//           );
-//           console.log(User)
-//           // req.body.userID = User._id;
-//           return res.send({ token,category:User.category,name:User.name,email:User.email });
-//     } else {
-//       return res.send("Signup Please");
-//     }
-//   } catch (e) {
-//     return res.status(401).send({message:e.message});
-//   }
-// });
 
 App.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -81,7 +54,7 @@ App.post("/login", async (req, res) => {
             expiresIn: "10 day",
           }
         );
-        req.body.userID=user_id;
+        req.body.userID=user._id;
         res.status(201).send({ message: "Login Success", token, category:user.category,name:user.name,email:user.email });
       } else {
         res.status(400).send({ message: "Wrong Credential" });

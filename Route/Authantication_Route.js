@@ -2,31 +2,30 @@ const Auth_Sign = require("../model/Authantication_Model");
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const App = express.Router();
-const argon2 =require("argon2")
+const argon2 = require("argon2");
+const bcrypt = require('bcrypt');
 
 App.post("/signup", async (req, res) => {
   const { email, password, name, country, mobile, gender } = req.body;
   const regExp = /[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{3,8}/g;
   const userEmail = await Auth_Sign.findOne({ email });
-  
+
   try {
     if (userEmail) {
       return res.send("User already exists");
     } else if (regExp.test(email)) {
-      
-      const hash= await argon2.hash(password)
+      const hash = await bcrypt.hash(password, 5);
 
-          const User = await Auth_Sign.create({
-            email,
-            password:hash,
-            name,
-            country,
-            mobile,
-            gender,
-          });
+      const User = await Auth_Sign.create({
+        email,
+        password: hash,
+        name,
+        country,
+        mobile,
+        gender,
+      });
 
-          return res.status(201).send({ message: "Successfull" });
-        
+      return res.status(201).send({ message: "Successfull" });
     } else {
       return res.status(403).send({ message: "Passowrd need to be stronger" });
     }
@@ -35,33 +34,62 @@ App.post("/signup", async (req, res) => {
   }
 });
 
+// App.post("/login", async (req, res) => {
+//   const { email, password } = req.body;
+//   const User = await Auth_Sign.findOne({ email });
+//   try {
+//     console.log(User)
+
+//     if (await argon2.verify(User.password,password)){
+//           let token = jwt.sign(
+//             {
+//               email,
+//               userID: User._id,
+//             },
+//             process.env.key,
+//             {
+//               expiresIn: "10 day",
+//             }
+//           );
+//           console.log(User)
+//           // req.body.userID = User._id;
+//           return res.send({ token,category:User.category,name:User.name,email:User.email });
+//     } else {
+//       return res.send("Signup Please");
+//     }
+//   } catch (e) {
+//     return res.status(401).send({message:e.message});
+//   }
+// });
+
 App.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const User = await Auth_Sign.findOne({ email });
   try {
-    console.log(User)
-    
-    if (await argon2.verify(User.password,password)){
-          let token = jwt.sign(
-            {
-              email,
-              userID: User._id,
-            },
-            process.env.key,
-            {
-              expiresIn: "10 day",
-            }
-          );
-          console.log(User)
-          // req.body.userID = User._id;
-          return res.send({ token,category:User.category,name:User.name,email:User.email });
-
-      
+    let user = await Auth_Sign.findOne({ email });
+    if (!user) {
+      res.status(400).send({ message: "Register First" });
     } else {
-      return res.send("Signup Please");
+      const match = await bcrypt.compare(password, user.password);
+      if (match) {
+        let token = jwt.sign(
+          {
+            email,
+            userID: user._id,
+          },
+          process.env.key,
+          {
+            expiresIn: "10 day",
+          }
+        );
+        res.status(201).send({ message: "Login Success", token, category:user.category,name:user.name,email:user.email });
+      } else {
+        res.status(400).send({ message: "Wrong Credential" });
+      }
     }
-  } catch (e) {
-    return res.status(401).send({message:e.message});
+  } catch (err) {
+    res
+      .status(401)
+      .send({ error: err.message, message: "Somthing Went Wrong While Login" });
   }
 });
 

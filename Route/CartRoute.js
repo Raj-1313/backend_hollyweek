@@ -9,14 +9,16 @@ const authModel = require('../model/Authantication_Model')
 
 app.get("/" ,async(req,res)=>{
     const userID = req.body.userID
-    try{
-        
-        const prod= await CartModel.find({userID}).populate("productID")  
-        if(prod.length>0){
-            // console.log(prod)
-          return  res.send(prod)           
-        }else{
-            return res.send({data:"null"})
+    try{        
+        if(userID!==null){
+
+            const prod= await CartModel.find({userID}).populate("productID")  
+            if(prod.length>0){
+                // console.log(prod)
+                return  res.send(prod)           
+            }else{
+                return res.send({data:"null"})
+            }
         }
        }catch(err){
            res.send(err.message)

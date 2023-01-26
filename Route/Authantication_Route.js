@@ -81,6 +81,7 @@ App.post("/login", async (req, res) => {
             expiresIn: "10 day",
           }
         );
+        req.body.userID=user_id;
         res.status(201).send({ message: "Login Success", token, category:user.category,name:user.name,email:user.email });
       } else {
         res.status(400).send({ message: "Wrong Credential" });
